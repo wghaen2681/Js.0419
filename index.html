@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      padding: 50px;
+      overflow-x: hidden;
+    }
+
+    #container {
+      position: absolute;
+      left: 50%;
+      top: 180px;
+      transform: translateX(-50%);
+    }
+
+    #grenade {
+      width: 70px;
+      height: 70px;
+      background-image: url(./img/grenade.png);
+      background-size: cover;
+      background-position: center;
+      position: absolute;
+      z-index: 50;
+      left: 5px;
+      top: 320px;
+    }
+
+    #bullet {
+      width: 80px;
+      height: 80px;
+      background: url(./img/bullet-cartoon.png);
+      background-size: contain;
+      position: absolute;
+      z-index: 50;
+      left: 20px;
+      top: 85vh;
+    }
+
+    #multiply {
+      width: 60px;
+      height: 60px;
+      background: url(./img/blood_number/multiply.png);
+      background-repeat: no-repeat;
+      background-size: contain;
+      position: absolute;
+      z-index: 50;
+      left: 103px;
+      top: 86.7vh;
+    }
+
+    #num1 {
+      width: 60px;
+      height: 60px;
+      background-image: url(./img/blood_number/0.png);
+      background-repeat: no-repeat;
+      background-size: contain;
+      position: absolute;
+      z-index: 50;
+      left: 177px;
+      top: 86vh;
+    }
+
+    #num2 {
+      width: 60px;
+      height: 60px;
+      background: url(./img/blood_number/0.png);
+      background-repeat: no-repeat;
+      background-size: contain;
+      position: absolute;
+      z-index: 50;
+      left: 235.7px;
+      top: 85.8vh;
+    }
+
+    #game {
+      width: 400px;
+      height: 400px;
+      background: black;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #game-background {
+      width: 400px;
+      height: 400px;
+      background: url(./img/halloween/2.gif);
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      opacity: 0.16;
+      overflow: hidden;
+      position: relative;
+      z-index: 30;
+    }
+
+    #game img {
+      height: 150px;
+      position: absolute;
+    }
+
+    #btn-full-screen {
+      float: right;
+    }
+
+    .aim {
+      cursor: url(./img/cursor_white.png) 50 50, auto;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container">
+    <div id="grenade"></div>
+    <!-- 4/20 做到 bullet 數量數字顯示（測試中） -------------------------------------->
+    <div id="bullet-container">
+      <div id="bullet" class="group"></div>
+      <div id="multiply" class="group"></div>
+      <div id="num1" class="group"></div>
+      <div id="num2" class="group"></div>
+    </div>
+    <div id="game" class="aim">
+      <div id="game-background"></div>
+    </div>
+    <br>
+    <input type="button" value="開始" id="btn-start">
+    <input type="button" value="全螢幕" id="btn-full-screen">
+    <br>
+    <p>分數: <span id="text-score">0</span> 分</p>
+    <p>剩餘: <span id="text-time">0</span> 秒</p>
+  </div>
+
+
+  <script src="./jquery-3.6.0.min.js"></script>
+  <script src="http://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <script>
+    // 分數
+    let score = 0
+    // 遊戲時間
+    let countdown = 30
+    // 倒數計時
+    let timer = 0
+    // 全螢幕判斷項 
+    let index = $('#btn-full-screen').val()
+
+    // 設定殭屍隨機走動的 function  
+    const move = (zb) => {
+      zb.stop().animate({
+        left: Math.round(Math.random() * 70) + '%',
+        top: Math.round(Math.random() * 70) + '%'
+      }, 2000, function () {
+        move(zb)
+      })
+    }
+
+    // 隱藏 grenade 物件 
+    $('#grenade').hide()
+    $('#grenade').css({
+      'user-select': 'none',
+      '-webkit-user-drag': 'none',
+      'pointer-events': 'none'
+    })
+
+    // 隱藏 bullet-container 物件 
+    $('#bullet-container').hide()
+    $('#bullet-container').css({
+      'user-select': 'none',
+      '-webkit-user-drag': 'none',
+      'pointer-events': 'none'
+    })
+
+    // 設定顯示子彈剩餘量 
+    let n = 30
+    $('#num1').css('background-image', `url(./img/blood_number/${Math.floor(n / 10)}.png)`)
+    $('#num2').css('background-image', `url(./img/blood_number/${n % 10}.png)`)
+
+    $('#btn-start').click(function () {
+      // 使開始按鈕在被點擊後失效  
+      $(this).attr('disabled', true)
+
+      // 重設
+      score = 0
+      $('#text-score').text(score)
+      countdown = 30
+      $('#text-time').text(countdown)
+
+      $('#grenade').hide()
+      $('#grenade').css({
+        'user-select': 'none',
+        '-webkit-user-drag': 'none',
+        'pointer-events': 'none'
+      })
+
+      if (n < 10) {
+        $('#num1').css('background-image', `url(./img/blood_number/${n}.png)`)
+      } else if (n >= 10 && n < 100) {
+        $('#num1').css('background-image', `url(./img/blood_number/${Math.floor(n / 10)}.png)`)
+        $('#num2').css('background-image', `url(./img/blood_number/${n % 10}.png)`)
+      }
+
+      timer = setInterval(() => {
+        // 倒數
+        countdown--
+        $('#text-time').text(countdown)
+
+        let rand = Math.round(Math.random() * 10)
+        // 隨機決定是否產生殭屍 
+        if (rand > 2 && $('#game img').length < 10) {
+          const zb = $(`<img src="./img/1.gif" alt="" class="bullet_count" style="left:${Math.round(Math.random() * 70)}%;top:${Math.round(Math.random() * 70)}%;z-index:70;">`)
+          $('#game').append(zb)
+          move(zb)
+        }
+        index = $('#btn-full-screen').val()
+        // 隨機決定是否提供手榴彈  
+        if (index === '退出全螢幕' && rand > 9) {
+          $('#grenade').show();
+          $('#grenade').css({
+            'user-select': 'text',
+            '-webkit-user-drag': 'element',
+            'pointer-events': 'auto'
+          })
+        }
+        // 時間到
+        if (countdown <= 0) {
+          clearInterval(timer)
+          Swal.fire({
+            icon: 'info',
+            title: '時間到',
+            text: `你得到 ${score} 分`
+          })
+          $('#game img').remove()
+          $(this).attr('disabled', false)
+        }
+      }, 1000);
+    })
+
+    // 設定殭屍被點擊的效果 
+    $('#game').on('click', 'img', function () {
+      $(this).attr('src', './img/blood.png')
+      $(this).stop()
+      // 忽略點擊事件、無法點擊和選取
+      $(this).css({
+        'user-select': 'none',
+        '-webkit-user-drag': 'none',
+        'pointer-events': 'none'
+      })
+      score++
+      $('#text-score').text(score)
+    })
+
+    // 設定手榴彈被點擊的效果 
+    $('#grenade').click(function () {
+      $('#grenade').hide()
+      $('#game img').attr('src', './img/blood.png')
+      $('#game img').stop()
+      // 忽略點擊事件、無法點擊和選取
+      $(this).css({
+        'user-select': 'none',
+        '-webkit-user-drag': 'none',
+        'pointer-events': 'none'
+      })
+
+      // 設定加分 
+      score += $('#game img').length
+      $('#text-score').text(score)
+
+    })
+
+    // 設定全螢幕按鈕 
+    $('#btn-full-screen').click(function () {
+      index = $('#btn-full-screen').val()
+      if (index === '全螢幕') {
+        $('#game').css('width', '100vw')
+        $('#game').css('height', '100vh')
+        $('#game-background').css('width', '100vw')
+        $('#game-background').css('height', '100vh')
+
+        $('#container').css('top', '0px')
+        $('#bullet-container').show();
+        $('#bullet-container').css({
+          'user-select': 'text',
+          '-webkit-user-drag': 'element',
+          'pointer-events': 'auto'
+        })
+        $('#btn-full-screen').val('退出全螢幕')
+      } else {
+        $('#game').css('width', '400px')
+        $('#game').css('height', '400px')
+        $('#game-background').css('width', '400px')
+        $('#game-background').css('height', '400px')
+
+        $('#container').css('top', '180px')
+        $('#grenade').hide()
+        $('#grenade').css({
+          'user-select': 'none',
+          '-webkit-user-drag': 'none',
+          'pointer-events': 'none'
+        })
+        $('#bullet-container').hide()
+        $('#bullet-container').css({
+          'user-select': 'none',
+          '-webkit-user-drag': 'none',
+          'pointer-events': 'none'
+        })
+        $('#btn-full-screen').val('全螢幕')
+      }
+    })
+
+    // 計算扣減子彈剩餘量的程式碼 
+    function ammo_minus() {
+      n--
+      if (n >= 10 && n < 100) {
+        $('#num1').css('background-image', `url(./img/blood_number/${Math.floor(n / 10)}.png)`)
+        $('#num2').css('background-image', `url(./img/blood_number/${n % 10}.png)`)
+      } else if (n < 10 && n >= 0) {
+        $('#num1').css('background-image', `url(./img/blood_number/${n}.png)`)
+        $('#num2').hide()
+      }
+      if (n < 0) {
+        clearInterval(timer)
+        Swal.fire({
+          icon: 'info',
+          title: '遊戲結束',
+          text: `你得到 ${score} 分`
+        })
+        $('#game img').remove()
+        $('#btn-start').attr('disabled', false)
+      }
+    }
+    $('#game-background').click(ammo_minus)
+    $('#game').on('click', 'img', ammo_minus)
+  </script>
+</body>
+
+</html>
