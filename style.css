@@ -1,0 +1,120 @@
+body {
+  padding: 50px;
+  overflow-x: hidden;
+}
+
+#container {
+  position: absolute;
+  left: 50%;
+  top: 180px;
+  transform: translateX(-50%);
+}
+
+.containerFullScreen {
+  top: 0px !important;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden
+}
+
+#grenade {
+  width: 70px;
+  height: 70px;
+  background-image: url(./img/grenade.png);
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  z-index: 50;
+  left: 5px;
+  top: 320px;
+}
+
+#bullet {
+  width: 80px;
+  height: 80px;
+  background: url(./img/bullet-cartoon.png);
+  background-size: contain;
+  position: absolute;
+  z-index: 50;
+  left: 40px;
+  bottom: 6vh;
+}
+
+#multiply {
+  width: 60px;
+  height: 60px;
+  background: url(./img/blood_number/multiply.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  position: absolute;
+  z-index: 50;
+  left: 123px;
+  bottom: 6vh;
+}
+
+#num1 {
+  width: 60px;
+  height: 60px;
+  background-image: url(./img/blood_number/0.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  position: absolute;
+  z-index: 50;
+  left: 197px;
+  bottom: 7vh;
+}
+
+#num2 {
+  width: 60px;
+  height: 60px;
+  background: url(./img/blood_number/0.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  position: absolute;
+  z-index: 50;
+  left: 255.7px;
+  bottom: 7vh;
+}
+
+#game {
+  width: 400px;
+  height: 400px;
+  background: black;
+  overflow: hidden;
+  position: relative;
+}
+
+#game-background {
+  width: 400px;
+  height: 400px;
+  background: url(./img/halloween/2.gif);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.16;
+  overflow: hidden;
+  position: relative;
+  z-index: 30;
+}
+
+#game img {
+  height: 150px;
+  position: absolute;
+}
+
+#btn-full-screen {
+  float: right;
+}
+
+.aim {
+  cursor: url(./img/cursor_white.png) 50 50, auto;
+}
+
+.functionsFullScreen {
+  position: absolute;
+  right: 4vw;
+  bottom: 5vh;
+  z-index: 100;
+  width: 170px;
+  color: white
+}
